@@ -1,0 +1,16 @@
+streamlit>=1.38
+numpy>=1.26
+pandas>=2.1
+openai>=1.40
+tiktoken>=0.7
+python-dotenv>=1.0
+langchain>=0.2
+langchain-openai>=0.1
+langchain-experimental>=0.0.60
+requests>=2.31
+beautifulsoup4>=4.12
+langchain_classic
+langchain_core
+langchain_chroma
+beautifulsoup4
+
