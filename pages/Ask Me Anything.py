@@ -6,11 +6,14 @@ import streamlit as st
 from bs4 import BeautifulSoup
 import requests
 from openai import OpenAI
+from utility import inject_custom_css
+
+st.set_page_config(page_title="Ask Me Anything", page_icon="💬", layout="wide")
+inject_custom_css()
 
 if not st.session_state.get("password_correct", False):
     st.warning("Please log in from the main page.")
     st.stop()
-
 
 if not os.environ.get("OPENAI_API_KEY"):
     os.environ["OPENAI_API_KEY"] = st.secrets["OPENAPI_API_KEY"]
@@ -56,8 +59,15 @@ def fetch_all_sources():
     return "\n\n".join(context_parts)
 
 
-st.title("Ask me any question about Singapore family benefits")
-st.caption("This page scrapes live content from all official government URLs listed in knowledge_base.json, sends the scraped text as context to OpenAI, and answers your questions. Supports follow-up questions with conversation history.")
+st.markdown("""
+<div class="section-header">
+    <span class="icon">💬</span>
+    <h2>Ask Me Anything</h2>
+</div>
+""", unsafe_allow_html=True)
+st.caption("Ask any question about Singapore family benefits. The app scrapes live content from official government websites and uses AI to answer. Supports follow-up questions with full conversation history.")
+
+st.markdown('<div class="gradient-divider"></div>', unsafe_allow_html=True)
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -68,6 +78,18 @@ if "context_loaded" not in st.session_state:
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
+
+if not st.session_state.messages:
+    st.markdown("""
+    <div class="info-card" style="text-align: center; padding: 2rem;">
+        <p style="font-size: 1.1rem; color: #475569; margin-bottom: 0.5rem;">
+            <strong>Welcome!</strong> Ask me anything about Singapore family benefits.
+        </p>
+        <p style="font-size: 0.9rem; color: #94a3b8;">
+            Try: "What is the Baby Bonus scheme?" or "I have 2 kids, what grants can I get?"
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
 if question := st.chat_input("Ask about Singapore family benefits..."):
     st.session_state.messages.append({"role": "user", "content": question})
@@ -97,11 +119,20 @@ if question := st.chat_input("Ask about Singapore family benefits..."):
     st.session_state.messages.append({"role": "assistant", "content": response})
 
 with st.sidebar:
-    st.subheader("Sources")
+    st.markdown("""
+    <div style="text-align: center; padding: 0.5rem 0 1rem 0;">
+        <span style="font-size: 1.5rem;">📚</span>
+        <h3 style="margin: 0.3rem 0 0 0; font-size: 1rem;">Data Sources</h3>
+    </div>
+    """, unsafe_allow_html=True)
     for entry in knowledge_base:
         st.markdown(f"- [{entry['title']}]({entry['url']})")
     st.divider()
-    if st.button("Clear conversation"):
+    if st.button("🗑️ Clear conversation"):
         st.session_state.messages = []
         st.rerun()
-    st.warning("Information is summarised by AI from official government websites. Always verify with official sources.")
+    st.markdown("""
+    <div class="disclaimer-card" style="margin-top: 1rem; background: rgba(255,251,235,0.15); border-color: rgba(253,230,138,0.3);">
+        <p style="color: #fde68a !important; font-size: 0.82rem;">⚠️ Information is summarised by AI from official government websites. Always verify with official sources.</p>
+    </div>
+    """, unsafe_allow_html=True)

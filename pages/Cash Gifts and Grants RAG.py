@@ -3,10 +3,15 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import streamlit as st
 from datetime import date
+from utility import inject_custom_css
+
+st.set_page_config(page_title="Baby Cash Gifts & Grants Advisor", page_icon="💰", layout="wide")
+inject_custom_css()
 
 if not st.session_state.get("password_correct", False):
     st.warning("Please log in from the main page.")
     st.stop()
+
 from openai import OpenAI
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
@@ -24,7 +29,7 @@ filename_list = [
     'Baby Bonus Scheme _ LifeSG – Benefits and support.mhtml',
     'Large Families Scheme _ Family planning – LifeSG.mhtml',
     'SG Child Support Package _ LifeSG.mhtml',
-]  
+]
 
 @st.cache_resource
 def build_retriever():
@@ -47,10 +52,23 @@ def build_retriever():
 
 retriever = build_retriever()
 
-st.set_page_config(page_title="Baby Cash Gifts & Grants Advisor")
-st.title("Baby Cash Gifts & Grants Advisor")
-st.caption("Enter your children's details (DOB, citizenship). This page uses RAG — retrieving relevant information from locally stored government documents (Baby Bonus, SG Child Support Package, Large Families Scheme) and using AI to summarise the cash gifts and grants your family is eligible for.")
-st.subheader("Enter your children's details")
+st.markdown("""
+<div class="section-header">
+    <span class="icon">💰</span>
+    <h2>Baby Cash Gifts & Grants Advisor</h2>
+</div>
+""", unsafe_allow_html=True)
+st.caption("Enter your children's details below. This page uses RAG — retrieving relevant information from locally stored government documents and using AI to summarise the cash gifts and grants your family is eligible for.")
+
+st.markdown('<div class="gradient-divider"></div>', unsafe_allow_html=True)
+
+st.markdown("""
+<div class="section-header">
+    <span class="icon">👶</span>
+    <h2>Children's Details</h2>
+</div>
+""", unsafe_allow_html=True)
+
 count = st.number_input("Number of children", min_value=1, max_value=10, value=1, step=1)
 
 children = []
@@ -64,7 +82,8 @@ for i in range(int(count)):
         citizenship = st.selectbox("Citizenship", ["Singapore Citizen", "Not Singapore Citizen"], key=f"cit_{i}")
     children.append({"order": i + 1, "dob": dob, "citizenship": citizenship})
 
-if st.button("Show my Cash Gifts & Grants"):
+st.markdown("")
+if st.button("Show my Cash Gifts & Grants", type="primary"):
     has_valid = any(c["dob"] is not None for c in children)
     if not has_valid:
         st.error("Please enter at least one child's date of birth.")
@@ -84,10 +103,15 @@ if st.button("Show my Cash Gifts & Grants"):
             relevant_docs = retriever.invoke(query)
             context = "\n\n".join([doc.page_content for doc in relevant_docs])
 
-        st.divider()
+        st.markdown('<div class="gradient-divider"></div>', unsafe_allow_html=True)
 
-        # --- Section 1: Cash Gifts & Grants ---
-        st.subheader("Cash Gifts & Grants")
+        st.markdown("""
+        <div class="section-header">
+            <span class="icon">📋</span>
+            <h2>Cash Gifts & Grants</h2>
+        </div>
+        """, unsafe_allow_html=True)
+
         with st.spinner("Analysing grants for your family..."):
             grants_prompt = f"""Based on the official government source data below, list ALL cash gifts and grants this family is eligible for from birth until each child turns 12 years old.
 
@@ -117,13 +141,20 @@ If a benefit eligibility is uncertain, note it clearly.
             )
             st.markdown(grants_response.choices[0].message.content)
 
-        # --- Section 2: Year-by-year timeline chart ---
+        st.markdown('<div class="gradient-divider"></div>', unsafe_allow_html=True)
+
         earliest_dob = min(c["dob"] for c in children if c["dob"] is not None)
         latest_dob = max(c["dob"] for c in children if c["dob"] is not None)
         start_year = earliest_dob.year
         end_year = latest_dob.year + 12
 
-        st.subheader("Benefits Timeline (Birth to Age 12)")
+        st.markdown("""
+        <div class="section-header">
+            <span class="icon">📅</span>
+            <h2>Benefits Timeline (Birth to Age 12)</h2>
+        </div>
+        """, unsafe_allow_html=True)
+
         with st.spinner("Generating year-by-year breakdown..."):
             timeline_prompt = f"""Based on the official government source data below, create a year-by-year breakdown of ALL cash gifts and grants this family receives from the 1st child's birth until the youngest child turns 12.
 
@@ -178,14 +209,12 @@ Respond with ONLY the JSON array, nothing else."""
 
                 benefit_cols = ["Cash Gift", "CDA First Step Grant", "CDA Matching Cap", "MediSave Grant", "Edusave", "PSEA Top-Up", "Other Grants"]
 
-                # Show detailed per-child table
                 detail_display = df.copy()
                 detail_display["Year Total"] = detail_display[benefit_cols].sum(axis=1)
                 for col in benefit_cols + ["Year Total"]:
                     detail_display[col] = detail_display[col].apply(lambda x: f"${x:,}")
                 st.dataframe(detail_display, use_container_width=True, hide_index=True)
 
-                # Aggregate per year across all children for charts
                 yearly = df.groupby("Year")[benefit_cols].sum().reset_index()
 
                 cumulative = 0
@@ -195,8 +224,12 @@ Respond with ONLY the JSON array, nothing else."""
                     cumulative_col.append(cumulative)
                 yearly["Cumulative Total"] = cumulative_col
 
-                # Summary table
-                st.subheader("Yearly Totals (All Children Combined)")
+                st.markdown("""
+                <div class="section-header">
+                    <span class="icon">📊</span>
+                    <h2>Yearly Totals (All Children Combined)</h2>
+                </div>
+                """, unsafe_allow_html=True)
                 yearly_display = yearly.copy()
                 for col in benefit_cols + ["Cumulative Total"]:
                     yearly_display[col] = yearly_display[col].apply(lambda x: f"${x:,}")
@@ -206,7 +239,12 @@ Respond with ONLY the JSON array, nothing else."""
                 chart_df = chart_df.set_index("Year")
                 st.bar_chart(chart_df)
 
-                st.subheader("Cumulative Benefits Over Time")
+                st.markdown("""
+                <div class="section-header">
+                    <span class="icon">📈</span>
+                    <h2>Cumulative Benefits Over Time</h2>
+                </div>
+                """, unsafe_allow_html=True)
                 cumulative_df = yearly[["Year", "Cumulative Total"]].copy()
                 cumulative_df = cumulative_df.set_index("Year")
                 st.line_chart(cumulative_df)
@@ -214,8 +252,15 @@ Respond with ONLY the JSON array, nothing else."""
             except (_json.JSONDecodeError, KeyError):
                 st.markdown(timeline_response.choices[0].message.content)
 
-        st.divider()
-        st.warning("Information is retrieved from official government websites and summarised by AI. Amounts and eligibility may change — always verify with official sources before making financial decisions.")
-        with st.expander("Sources used"):
+        st.markdown('<div class="gradient-divider"></div>', unsafe_allow_html=True)
+
+        st.markdown("""
+        <div class="disclaimer-card">
+            <p>⚠️ Information is retrieved from official government websites and summarised by AI.
+            Amounts and eligibility may change — always verify with official sources before making financial decisions.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        with st.expander("📚 Sources used"):
             for filename in filename_list:
                 st.markdown(f"- {filename}")

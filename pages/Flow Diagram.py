@@ -1,16 +1,35 @@
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import streamlit as st
+from utility import inject_custom_css
 
 st.set_page_config(page_title="Application Flow Diagram", page_icon="🔀", layout="wide")
+inject_custom_css()
 
 if not st.session_state.get("password_correct", False):
     st.warning("Please log in from the main page.")
     st.stop()
 
-st.title("Application Flow Diagram")
+st.markdown("""
+<div class="section-header">
+    <span class="icon">🔀</span>
+    <h2>Application Flow Diagram</h2>
+</div>
+""", unsafe_allow_html=True)
 st.caption("This page shows how the different components of the application work together.")
 
-st.subheader("Overall Application Flow")
-st.code("""
+st.markdown('<div class="gradient-divider"></div>', unsafe_allow_html=True)
+
+st.markdown("""
+<div class="section-header">
+    <span class="icon">🏗️</span>
+    <h2>Overall Application Flow</h2>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div class="styled-code">
 ┌─────────────────────────────────────────────────────┐
 │                    User visits app                    │
 │                    (app.py)                           │
@@ -54,17 +73,29 @@ st.code("""
         ┌─────────────────────────────────────────┐
         │          Response displayed to user       │
         └─────────────────────────────────────────┘
-""", language=None)
+</div>
+""", unsafe_allow_html=True)
 
-st.divider()
+st.markdown('<div class="gradient-divider"></div>', unsafe_allow_html=True)
 
-st.subheader("Page-by-Page Flow")
+st.markdown("""
+<div class="section-header">
+    <span class="icon">📄</span>
+    <h2>Page-by-Page Flow</h2>
+</div>
+""", unsafe_allow_html=True)
 
-tab1, tab2, tab3 = st.tabs(["Cash Gifts & Grants RAG", "Ask Me Anything", "Benefit Advisory"])
+tab1, tab2, tab3 = st.tabs(["💰 Cash Gifts & Grants RAG", "💬 Ask Me Anything", "📋 Benefit Advisory"])
 
 with tab1:
-    st.markdown("#### Cash Gifts & Grants RAG")
-    st.code("""
+    st.markdown("""
+    <div class="section-header">
+        <span class="icon">💰</span>
+        <h2>Cash Gifts & Grants RAG</h2>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown("""
+<div class="styled-code">
     User Input                    RAG Pipeline                    Output
     ──────────                    ────────────                    ──────
 
@@ -117,17 +148,29 @@ with tab1:
                                                       │ Cumulative line  │
                                                       │ chart            │
                                                       └──────────────────┘
-    """, language=None)
+</div>
+    """, unsafe_allow_html=True)
+    st.markdown("")
     st.markdown("""
-    **Data Sources:** 3 locally stored `.mhtml` files in `RAG/` folder
-    - Baby Bonus Scheme (LifeSG)
-    - Large Families Scheme (LifeSG)
-    - SG Child Support Package (LifeSG)
-    """)
+    <div class="info-card">
+        <strong>📁 Data Sources:</strong> 3 locally stored <code>.mhtml</code> files in <code>RAG/</code> folder
+        <ul style="color: #475569; font-size: 0.9rem; margin-top: 0.5rem;">
+            <li>Baby Bonus Scheme (LifeSG)</li>
+            <li>Large Families Scheme (LifeSG)</li>
+            <li>SG Child Support Package (LifeSG)</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
 
 with tab2:
-    st.markdown("#### Ask Me Anything")
-    st.code("""
+    st.markdown("""
+    <div class="section-header">
+        <span class="icon">💬</span>
+        <h2>Ask Me Anything</h2>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown("""
+<div class="styled-code">
     User Input                    Processing                      Output
     ──────────                    ──────────                      ──────
 
@@ -168,15 +211,27 @@ with tab2:
                                                       │ follow-up        │
                                                       │ questions        │
                                                       └──────────────────┘
-    """, language=None)
+</div>
+    """, unsafe_allow_html=True)
+    st.markdown("")
     st.markdown("""
-    **Data Sources:** All 15 URLs from `data/knowledge_base.json`, scraped live
-    - LifeSG, IRAS, MSF, ECDA, MOE, CPF Board, and more
-    """)
+    <div class="info-card">
+        <strong>🌐 Data Sources:</strong> All 15 URLs from <code>data/knowledge_base.json</code>, scraped live
+        <ul style="color: #475569; font-size: 0.9rem; margin-top: 0.5rem;">
+            <li>LifeSG, IRAS, MSF, ECDA, MOE, CPF Board, and more</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
 
 with tab3:
-    st.markdown("#### Benefit Advisory")
-    st.code("""
+    st.markdown("""
+    <div class="section-header">
+        <span class="icon">📋</span>
+        <h2>Benefit Advisory</h2>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown("""
+<div class="styled-code">
     User Input                    Processing                      Output
     ──────────                    ──────────                      ──────
 
@@ -214,24 +269,44 @@ with tab3:
                                                       │ Source cards     │
                                                       │ with links       │
                                                       └──────────────────┘
-    """, language=None)
+</div>
+    """, unsafe_allow_html=True)
+    st.markdown("")
     st.markdown("""
-    **Data Sources:** Local `data/knowledge_base.json` metadata only (no live scraping)
-    - Searches titles, excerpts, tags, and agency fields
-    - Falls back to keyword search if no OpenAI API key is set
-    """)
+    <div class="info-card">
+        <strong>📦 Data Sources:</strong> Local <code>data/knowledge_base.json</code> metadata only (no live scraping)
+        <ul style="color: #475569; font-size: 0.9rem; margin-top: 0.5rem;">
+            <li>Searches titles, excerpts, tags, and agency fields</li>
+            <li>Falls back to keyword search if no OpenAI API key is set</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
 
-st.divider()
+st.markdown('<div class="gradient-divider"></div>', unsafe_allow_html=True)
 
-st.subheader("Technology Stack")
 st.markdown("""
-| Component | Technology |
-|---|---|
-| Frontend | Streamlit |
-| LLM | OpenAI GPT-4o-mini |
-| Vector Store | Chroma (LangChain) |
-| Embeddings | OpenAI text-embedding-3-small |
-| Web Scraping | BeautifulSoup + Requests |
-| Document Loading | LangChain TextLoader |
-| Data Storage | JSON (knowledge_base.json) + MHTML files |
-""")
+<div class="section-header">
+    <span class="icon">⚙️</span>
+    <h2>Technology Stack</h2>
+</div>
+""", unsafe_allow_html=True)
+
+tech = [
+    ("Frontend", "Streamlit"),
+    ("LLM", "OpenAI GPT-4o-mini"),
+    ("Vector Store", "Chroma (LangChain)"),
+    ("Embeddings", "OpenAI text-embedding-3-small"),
+    ("Web Scraping", "BeautifulSoup + Requests"),
+    ("Document Loading", "LangChain TextLoader"),
+    ("Data Storage", "JSON + MHTML files"),
+]
+
+cols = st.columns(len(tech))
+for col, (label, value) in zip(cols, tech):
+    with col:
+        st.markdown(f"""
+        <div class="info-card" style="text-align: center; padding: 1rem 0.5rem;">
+            <p style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;">{label}</p>
+            <p style="color: #1a3a4a; font-weight: 600; font-size: 0.85rem; margin: 0;">{value}</p>
+        </div>
+        """, unsafe_allow_html=True)
