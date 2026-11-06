@@ -1,77 +1,101 @@
 import streamlit as st
-from utility import check_password
+from utility import check_password, inject_custom_css
 
-st.set_page_config(page_title="About Us", page_icon="ℹ️", layout="wide")
+st.set_page_config(page_title="SG Family Benefits Advisor", page_icon="🇸🇬", layout="wide")
+inject_custom_css()
 
 if not check_password():
     st.stop()
 
-st.title("About Us")
+st.markdown("""
+<div class="hero-banner">
+    <h1>🇸🇬 Singapore Family Benefits Advisor</h1>
+    <p>Explore government benefits for your family — powered by AI and official data sources</p>
+</div>
+""", unsafe_allow_html=True)
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    with st.container(border=True):
+        st.markdown("**💰 Cash Gifts & Grants**")
+        st.caption("Enter your children's details to see Baby Bonus cash gifts, CDA grants, MediSave grants, and a year-by-year timeline from birth to age 12.")
+        st.page_link("pages/Cash Gifts and Grants RAG.py", label="Open Cash Gifts & Grants →", icon="💰")
+
+with col2:
+    with st.container(border=True):
+        st.markdown("**💬 Ask Me Anything**")
+        st.caption("Ask any question about Singapore family benefits. The app scrapes the latest info from official sources and uses AI to answer — with follow-up support.")
+        st.page_link("pages/Ask Me Anything.py", label="Open Ask Me Anything →", icon="💬")
+
+with col3:
+    with st.container(border=True):
+        st.markdown("**🔀 Application Flow**")
+        st.caption("See how the app works under the hood — from data retrieval to AI-powered responses — with interactive architecture diagrams.")
+        st.page_link("pages/Flow Diagram.py", label="Open Application Flow →", icon="🔀")
+
+st.markdown('<div class="gradient-divider"></div>', unsafe_allow_html=True)
 
 st.markdown("""
-### Singapore Family Benefits Advisor
+<div class="section-header">
+    <span class="icon">📖</span>
+    <h2>How to Use</h2>
+</div>
+""", unsafe_allow_html=True)
 
-This application helps Singapore families understand and explore the government benefits
-they may be eligible for. It uses a RAG (Retrieval-Augmented Generation) approach —
-fetching live data from official government websites and using AI to summarise and
-answer your questions.
+how_col1, how_col2 = st.columns(2)
 
----
+with how_col1:
+    st.markdown("""
+    <div class="info-card">
+        <strong>💰 Cash Gifts & Grants</strong>
+        <ol style="color: #475569; font-size: 0.92rem; padding-left: 1.2rem;">
+            <li>Enter the number of children you have</li>
+            <li>Fill in each child's date of birth and citizenship</li>
+            <li>Click <em>"Show my Cash Gifts & Grants"</em></li>
+            <li>View the summary table, timeline, and charts</li>
+        </ol>
+    </div>
+    """, unsafe_allow_html=True)
 
-### What This App Does
+with how_col2:
+    st.markdown("""
+    <div class="info-card">
+        <strong>💬 Ask Me Anything</strong>
+        <ol style="color: #475569; font-size: 0.92rem; padding-left: 1.2rem;">
+            <li>Type any question about Singapore family benefits</li>
+            <li>The app fetches the latest info from official websites</li>
+            <li>Get an AI-generated answer with source context</li>
+            <li>Ask follow-up questions — conversation history is kept</li>
+        </ol>
+    </div>
+    """, unsafe_allow_html=True)
 
-- **Cash Gifts & Grants** — Enter your children's details to see a breakdown of Baby Bonus
-  cash gifts, CDA First Step Grant, CDA matching, MediSave grants, and a year-by-year timeline.
-- **Benefits Explorer** — Ask any question about Singapore family benefits and get answers
-  based on official government sources, with follow-up conversation support.
+st.markdown("")
+st.markdown("""
+> **Tip:** For best results, be specific — e.g. *"I have 2 children born in 2020 and 2023, what cash gifts am I eligible for?"*
+""")
 
----
+st.markdown('<div class="gradient-divider"></div>', unsafe_allow_html=True)
 
-### How to Use This App
-
-Use the **sidebar** on the left to navigate between pages:
-
-1. **Cash Gifts and Grants RAG**
-   - Enter the number of children you have
-   - Fill in each child's date of birth and citizenship
-   - Click **"Show my Cash Gifts & Grants"**
-   - View the summary table, year-by-year timeline, and charts showing your family's benefits from birth to age 12
-
-2. **Ask Me Anything**
-   - Type any question about Singapore family benefits in the chat box
-   - The app scrapes the latest information from official government websites and uses AI to answer
-   - Ask follow-up questions — the conversation remembers your previous questions
-
-3. **Benefit Advisory**
-   - Type a question about a specific scheme, eligibility, or historical rules
-   - The app searches the local knowledge base and retrieves relevant entries to answer your question
-
-**Tips:**
-- For best results, be specific in your questions (e.g. "I have 2 children born in 2020 and 2023, what cash gifts am I eligible for?")
-- All pages require login — enter your password on this page first
-- Information is AI-generated — always verify with official sources before making decisions
-
----
-
-### Data Sources
-
-All information is retrieved from official Singapore government websites including:
-
+with st.expander("📚 Data Sources"):
+    st.markdown("""
+    All information is retrieved from official Singapore government websites:
+    """)
+    st.markdown("""
 - [CPF Board](https://www.cpf.gov.sg/) — MediSave Grant for Newborns
 - [ECDA](https://www.ecda.gov.sg/) — Preschool Subsidies
-- [IRAS](https://www.iras.gov.sg/) — Parenthood Tax Rebate, Qualifying Child Relief, Working Mother's Child Relief
+- [IRAS](https://www.iras.gov.sg/) — Parenthood Tax Rebate, QCR, WMCR
 - [LifeSG](https://www.life.gov.sg/) — Baby Bonus, Child Support Package, Large Families Scheme
-- [MOE](https://www.moe.gov.sg/) — Edusave and Financial Assistance
-- [MSF Pro-Family Leave](https://www.profamilyleave.msf.gov.sg/) — Maternity, Paternity, Shared Parental Leave
-- [National Archives of Singapore](https://www.nas.gov.sg/archivesonline/) — Historical government announcements and policy documents
+- [MOE](https://www.moe.gov.sg/) — Edusave & Financial Assistance
+- [MSF Pro-Family Leave](https://www.profamilyleave.msf.gov.sg/) — Maternity, Paternity & Shared Parental Leave
+- [National Archives](https://www.nas.gov.sg/archivesonline/) — Historical policy documents
+    """)
 
----
-
-### Disclaimer
-
-This is a research aid and planning tool, **not an official government service**.
-Information is summarised by AI and may not always be accurate or up to date.
-Always verify with the official government sources before making financial decisions.
-
----
-""")
+st.markdown("""
+<div class="disclaimer-card">
+    <p>⚠️ <strong>Disclaimer:</strong> This is a research aid and planning tool, <strong>not an official government service</strong>.
+    Information is summarised by AI and may not always be accurate or up to date.
+    Always verify with official government sources before making financial decisions.</p>
+</div>
+""", unsafe_allow_html=True)
